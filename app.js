@@ -21,6 +21,18 @@ data.push(new someEvent(4,'Engineer','description','never'))
 app.get('/api/events', (req, res) => {
   res.json(data);
 });
+
+app.get('/api/events/:id', (req, res) => {
+  const id = req.params.id;
+
+  if (id > 0 && id <= data.length) {
+    res.json(data[id-1]);
+  } else {
+    res.status(400).end();
+  }
+  
+});
+
 app.post('/', (req, res) => {
   req.on('data', (data) => {
     console.log(data.toString('utf8'));
