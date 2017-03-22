@@ -1,6 +1,14 @@
 const express = require('express');
 const app = express();
 
+class someEvent {
+  constructor (id, title, description, date) {
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.date = date;
+  }
+}
 app.get('/', (req, res) => {
   res.send('Hello World!')
 });
