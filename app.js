@@ -30,7 +30,7 @@ app.get('/api/events/:id', (req, res) => {
   } else {
     res.status(400).end();
   }
-  
+
 });
 
 app.post('/api/events', (req, res) => {
@@ -47,6 +47,29 @@ app.post('/api/events', (req, res) => {
   });
 
   res.sendStatus(204);
+});
+
+app.put('/api/events', (req, res) => {
+  let bodyContent = '';
+  req.setEncoding('utf8');
+
+  req.on('data', (data) => {
+    bodyContent += data;
+  });
+
+  req.on('end', () => {
+    let jsonContent = JSON.parse(bodyContent);
+    let index = data.findIndex((event) => {
+      return jsonContent.id === event.id;
+    });
+    if (index !== -1) {
+      Object.assign(data[index],jsonContent);
+      res.sendStatus(202);
+    }
+    else {
+      res.sendStatus(404);
+    }
+  });
 });
 
 app.listen(3000, () => {
