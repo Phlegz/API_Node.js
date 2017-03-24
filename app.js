@@ -23,14 +23,16 @@ app.get('/api/events', (req, res) => {
 });
 
 app.get('/api/events/:id', (req, res) => {
-  const id = req.params.id;
+  let index = data.findIndex((event) => {
+      return +req.params.id === event.id;
+  });
 
-  if (id > 0 && id <= data.length) {
-    res.json(data[id-1]);
-  } else {
-    res.status(400).end();
+  if (index !== -1) {
+      res.status(200).json(data[index]);
   }
-
+  else {
+      res.sendStatus(404);
+  }
 });
 
 app.post('/api/events', (req, res) => {
@@ -70,6 +72,20 @@ app.put('/api/events', (req, res) => {
       res.sendStatus(404);
     }
   });
+});
+
+app.delete('/api/events/:id', (req, res) => {
+    let index = data.findIndex((event) => {
+      return +req.params.id === event.id;
+    });
+
+    if (index !== -1) {
+      data.splice(index, 1);
+      res.sendStatus(202);
+    }
+    else {
+      res.sendStatus(404);
+    }
 });
 
 app.listen(3000, () => {
