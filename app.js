@@ -33,11 +33,20 @@ app.get('/api/events/:id', (req, res) => {
   
 });
 
-app.post('/', (req, res) => {
+app.post('/api/events', (req, res) => {
+  let bodyContent = '';
+  req.setEncoding('utf8');
+
   req.on('data', (data) => {
-    console.log(data.toString('utf8'));
+    bodyContent += data;
   });
-  res.status(204).end();
+
+  req.on('end', () => {
+    let jsonContent = JSON.parse(bodyContent);
+    data.push(new someEvent(data.length+1, jsonContent.title, jsonContent.description, jsonContent.date));
+  });
+
+  res.sendStatus(204);
 });
 
 app.listen(3000, () => {
