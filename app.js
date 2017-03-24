@@ -51,7 +51,7 @@ app.post('/api/events', (req, res) => {
   res.sendStatus(204);
 });
 
-app.put('/api/events', (req, res) => {
+app.put('/api/events/:id', (req, res) => {
   let bodyContent = '';
   req.setEncoding('utf8');
 
@@ -62,9 +62,10 @@ app.put('/api/events', (req, res) => {
   req.on('end', () => {
     let jsonContent = JSON.parse(bodyContent);
     let index = data.findIndex((event) => {
-      return jsonContent.id === event.id;
+      return +req.params.id === event.id;
     });
     if (index !== -1) {
+      delete jsonContent.id;
       Object.assign(data[index],jsonContent);
       res.sendStatus(202);
     }
