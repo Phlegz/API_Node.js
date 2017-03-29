@@ -35,6 +35,7 @@ app.get('/api/events/:id', (req, res) => {
   }
 });
 
+// TODO: Adding a body parser in the app.post so making an exception in req.on would not yield the statusCode of 201.
 app.post('/api/events', (req, res) => {
   let bodyContent = '';
   req.setEncoding('utf8');
@@ -46,9 +47,9 @@ app.post('/api/events', (req, res) => {
   req.on('end', () => {
     let jsonContent = JSON.parse(bodyContent);
     data.push(new someEvent(data.length+1, jsonContent.title, jsonContent.description, jsonContent.date));
+    res.location(`/api/events/${data.length}`)
+    res.sendStatus(201);
   });
-
-  res.sendStatus(204);
 });
 
 app.put('/api/events/:id', (req, res) => {

@@ -42,4 +42,21 @@ describe('API', function() {
             });
     });
 
+    it('create an event', function() {
+        const event = {title:'something',description:'description',date:'date'};
+        return chai.request(servicePath)
+            .post('/api/events')
+            .send(event)
+            .then(function (res) {
+                chai.expect(res).to.have.status(201);
+                return chai.request(servicePath).get(res.headers.location);
+            })
+            .then(function (res) {
+              chai.assert.equal(res.body.title,event.title);
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
 });
