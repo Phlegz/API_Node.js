@@ -18,6 +18,7 @@ describe('API', function() {
                 throw err;
             });
     });
+
     it('returns a single event if id is valid', function() {
         return chai.request(servicePath)
             .get('/api/events/3')
@@ -28,19 +29,17 @@ describe('API', function() {
                 throw err;
             });
     });
-    // it('returns a single event if id is not valid', function() {
-    //     return chai.request(servicePath)
-    //         .get('/api/events/3')
-    //         .then(function (res) {
-    //
-    //           chai.expect(res).to.have.status(404)
-    //
-    //         })
-    //         .catch(function (err) {
-    //           console.log(err);
-    //           chai.expect(true).to.be.true
-    //           console.log(err.response.statusCode);
-    //         });
-    // });
+
+    it('returns a single event if id is not valid', function() {
+        return chai.request(servicePath)
+            .get('/api/events/0')
+            .then(function (res) {
+                chai.assert.fail(0, 1, "invalid event id returned valid http status");
+            })
+            .catch(function (err) {
+                chai.expect(err).to.have.property("response");
+                chai.expect(err.response.statusCode).to.eq(404);
+            });
+    });
 
 });
