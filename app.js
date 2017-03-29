@@ -19,7 +19,7 @@ data.push(new someEvent(4,'Engineer','description','never'))
 // --------------------------------------------------------------
 
 app.get('/api/events', (req, res) => {
-  res.json(data);
+  res.status(200).json(data);
 });
 
 app.get('/api/events/:id', (req, res) => {
