@@ -1,11 +1,15 @@
 'use strict'
 const
   MongoClient = require('mongodb').MongoClient,
+  ObjectId = require('mongodb').ObjectId,
   bodyParser = require('body-parser'),
-  express = require('express');
+  express = require('express'),
+  router = express.Router();
 
 const app = express();
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+
+app.use('/api', router);
 
 let db;
 MongoClient.connect('mongodb://localhost:27017/database', (err, connection) => {
@@ -36,10 +40,6 @@ data.push(new someEvent(3,'doctor','description','tomorrow'))
 data.push(new someEvent(4,'Engineer','description','never'))
 // --------------------------------------------------------------
 
-app.get('/api/events', (req, res) => {
-  res.status(200).json(data);
-});
-
 app.get('/api/events/:id', (req, res) => {
   let index = data.findIndex((event) => {
       return +req.params.id === event.id;
@@ -53,52 +53,63 @@ app.get('/api/events/:id', (req, res) => {
   }
 });
 
-app.post('/api/events', (req, res) => {
-  let event = req.body;
-  db.collection("events").insertOne(event).then(result => {
-    res.location(`/api/events/${result.insertedId}`)
-    res.send(201);
-  }).catch(err => {
-    res.status(500).json({message: err});
+router.route('/events')
+  .post((req, res) => {
+    let event = req.body;
+    db.collection("events").insertOne(event).then(result => {
+      res.location(`/api/events/${result.insertedId}`)
+      res.send(201);
+    }).catch(err => {
+      res.status(500).json({message: err});
+    })
   })
-});
 
-app.put('/api/events/:id', (req, res) => {
-  let bodyContent = '';
-  req.setEncoding('utf8');
+  .get((req,res) => {
+      db.collection("events").find().toArray().then(docs => {
+        res.status(200).json(docs);
+        console.log(docs);
+      })
+  })
 
-  req.on('data', (data) => {
-    bodyContent += data;
+router.route('/events/:id')
+  .put((req,res) => {
+    let id;
+    try {
+      id = ObjectId(req.params.id);
+    }
+    catch (err) {
+      res.status(400).end()
+      return;
+    }
+    db.collection("events").replaceOne(
+      {"_id": id},
+      req.body,
+      {upsert: true}
+    ).then(result => {
+      //[TODO] Have response info include whether the event was inserted or updated
+      res.status(200).end()
+      console.log(result);
+    })
+    .catch(err => {
+      res.status(500).end()
+      console.log(err);
+    })
+  })
+
+  .delete((req,res) => {
+    let id;
+    try {
+      id = ObjectId(req.params.id);
+    }
+    catch (err) {
+      res.status(400).end()
+      return;
+    }
+    db.collection("events").deleteOne( {"_id": id}).then(result => {
+      res.status(202).end();
+    })
+    //[TODO] Check result to see if the object is actually deleted and return a better response to user
+    .catch(err => {
+      res.status(500).json({message:err}).end()
+    })
   });
-
-  req.on('end', () => {
-    let jsonContent = JSON.parse(bodyContent);
-    let index = data.findIndex((event) => {
-      return +req.params.id === event.id;
-    });
-    if (index !== -1) {
-      delete jsonContent.id;
-      Object.assign(data[index],jsonContent);
-      res.sendStatus(202);
-    }
-    else {
-      res.sendStatus(404);
-    }
-  });
-});
-
-app.delete('/api/events/:id', (req, res) => {
-    let index = data.findIndex((event) => {
-      return +req.params.id === event.id;
-    });
-
-    if (index !== -1) {
-      data.splice(index, 1);
-      res.sendStatus(202);
-    }
-    else {
-      res.sendStatus(404);
-    }
-});
-
-
