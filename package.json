@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/Phlegz/API_Node.js#readme",
   "dependencies": {
-    "express.js": "^1.0.0"
+    "body-parser": "^1.17.1",
+    "express.js": "^1.0.0",
+    "mongodb": "^2.2.25"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -1,6 +1,24 @@
 'use strict'
-const express = require('express');
+const
+  MongoClient = require('mongodb').MongoClient,
+  bodyParser = require('body-parser'),
+  express = require('express');
+
 const app = express();
+app.use(bodyParser.json())
+
+let db;
+MongoClient.connect('mongodb://localhost:27017/database', (err, connection) => {
+  if (err) {
+    console.log("ERROR:", err);
+    return;
+  }
+
+  db = connection;
+  app.listen(3000, () => {
+    console.log('Example app listening on port 3000!')
+  });
+})
 
 class someEvent {
   constructor (id, title, description, date) {
@@ -35,21 +53,14 @@ app.get('/api/events/:id', (req, res) => {
   }
 });
 
-// TODO: Adding a body parser in the app.post so making an exception in req.on would not yield the statusCode of 201.
 app.post('/api/events', (req, res) => {
-  let bodyContent = '';
-  req.setEncoding('utf8');
-
-  req.on('data', (data) => {
-    bodyContent += data;
-  });
-
-  req.on('end', () => {
-    let jsonContent = JSON.parse(bodyContent);
-    data.push(new someEvent(data.length+1, jsonContent.title, jsonContent.description, jsonContent.date));
-    res.location(`/api/events/${data.length}`)
-    res.sendStatus(201);
-  });
+  let event = req.body;
+  db.collection("events").insertOne(event).then(result => {
+    res.location(`/api/events/${result.insertedId}`)
+    res.send(201);
+  }).catch(err => {
+    res.status(500).json({message: err});
+  })
 });
 
 app.put('/api/events/:id', (req, res) => {
@@ -90,6 +101,4 @@ app.delete('/api/events/:id', (req, res) => {
     }
 });
 
-app.listen(3000, () => {
-  console.log('Example app listening on port 3000!')
-});
+
