@@ -3,18 +3,15 @@ const
   MongoClient = require('mongodb').MongoClient,
   ObjectId = require('mongodb').ObjectId,
   bodyParser = require('body-parser'),
-  express = require('express');
-
-
-const
+  express = require('express'),
   app = express(),
   router = express.Router(); // get an instance of the express Router
 
+let db;
 
 app.use(bodyParser.json()); // configure app to use bodyParser(). this will let us get the data from a POST
 app.use('/api', router); // register our routes. All the routes will be prefixed with /api
 
-let db;
 MongoClient.connect('mongodb://localhost:27017/database', (err, connection) => {
   if (err) {
     console.log("ERROR:", err);
@@ -35,26 +32,6 @@ class someEvent {
     this.date = date;
   }
 }
-// Test data----------------------------------------------------
-let data = []
-data.push(new someEvent(1,'student','description','today'))
-data.push(new someEvent(2,'prof','description','yesterday'))
-data.push(new someEvent(3,'doctor','description','tomorrow'))
-data.push(new someEvent(4,'Engineer','description','never'))
-// --------------------------------------------------------------
-
-app.get('/api/events/:id', (req, res) => {
-  let index = data.findIndex((event) => {
-      return +req.params.id === event.id;
-  });
-
-  if (index !== -1) {
-      res.status(200).json(data[index]);
-  }
-  else {
-      res.sendStatus(404);
-  }
-});
 
 // on routes that end in /events------------------------------------------------------------
 router.route('/events')
@@ -77,6 +54,20 @@ router.route('/events')
 
 // on routes that end in /events/id ------------------------------------------------------------
 router.route('/events/:id')
+  .get((req,res) => {
+    let id;
+    try {
+      id = ObjectId(req.params.id);
+    }
+    catch (err) {
+      res.status(400).end()
+      return;
+    }
+    db.collection("events").findOne({"_id":id})
+      .then(result => result ? res.status(200).json(result) : res.status(404).send())
+      .catch(err => res.status(500).json({message: err}));
+  })
+
   .put((req,res) => {
     let id;
     try {
