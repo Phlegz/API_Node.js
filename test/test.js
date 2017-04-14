@@ -19,9 +19,9 @@ describe('API', function() {
             });
     });
 
-    it('returns a single event if id is valid', function() {
+    it('returns 200 if id is valid and exists', function() {
         return chai.request(servicePath)
-            .get('/api/events/3')
+            .get('/api/events/58f042fcf36d2878e4391a03')
             .then(function (res) {
                 chai.expect(res).to.have.status(200);
             })
@@ -30,9 +30,9 @@ describe('API', function() {
             });
     });
 
-    it('returns a single event if id is not valid', function() {
+    it('returns 404 if id is valid and does not exist', function() {
         return chai.request(servicePath)
-            .get('/api/events/0')
+            .get('/api/events/58f042fcf36d2878e4391a04')
             .then(function (res) {
                 chai.assert.fail(0, 1, "invalid event id returned valid http status");
             })
@@ -58,5 +58,4 @@ describe('API', function() {
                 throw err;
             });
     });
-
 });

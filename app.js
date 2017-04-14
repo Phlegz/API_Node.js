@@ -5,14 +5,15 @@ const
   bodyParser = require('body-parser'),
   express = require('express'),
   app = express(),
-  router = express.Router(); // get an instance of the express Router
+  router = express.Router(), // get an instance of the express Router
+  dbName = process.argv[2] === "test" ? "database-nodecourse-test" : "database-nodecourse";
 
 let db;
 
 app.use(bodyParser.json()); // configure app to use bodyParser(). this will let us get the data from a POST
 app.use('/api', router); // register our routes. All the routes will be prefixed with /api
 
-MongoClient.connect('mongodb://localhost:27017/database', (err, connection) => {
+MongoClient.connect(`mongodb://app:app@ds062059.mlab.com:62059/${dbName}`, (err, connection) => {
   if (err) {
     console.log("ERROR:", err);
     return;
@@ -20,7 +21,7 @@ MongoClient.connect('mongodb://localhost:27017/database', (err, connection) => {
 
   db = connection;
   app.listen(3000, () => {
-    console.log('Example app listening on port 3000!')
+    console.log(`Example app listening on port 3000!', 'Connected to Mongo DB ${dbName}`)
   });
 })
 
@@ -44,7 +45,6 @@ router.route('/events')
       res.status(500).json({message: err});
     })
   })
-
   .get((req,res) => {
       db.collection("events").find().toArray().then(docs => {
         res.status(200).json(docs);
