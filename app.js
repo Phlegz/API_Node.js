@@ -3,13 +3,16 @@ const
   MongoClient = require('mongodb').MongoClient,
   ObjectId = require('mongodb').ObjectId,
   bodyParser = require('body-parser'),
-  express = require('express'),
-  router = express.Router();
+  express = require('express');
 
-const app = express();
-app.use(bodyParser.json());
 
-app.use('/api', router);
+const
+  app = express(),
+  router = express.Router(); // get an instance of the express Router
+
+
+app.use(bodyParser.json()); // configure app to use bodyParser(). this will let us get the data from a POST
+app.use('/api', router); // register our routes. All the routes will be prefixed with /api
 
 let db;
 MongoClient.connect('mongodb://localhost:27017/database', (err, connection) => {
@@ -53,6 +56,7 @@ app.get('/api/events/:id', (req, res) => {
   }
 });
 
+// on routes that end in /events------------------------------------------------------------
 router.route('/events')
   .post((req, res) => {
     let event = req.body;
@@ -71,6 +75,7 @@ router.route('/events')
       })
   })
 
+// on routes that end in /events/id ------------------------------------------------------------
 router.route('/events/:id')
   .put((req,res) => {
     let id;
