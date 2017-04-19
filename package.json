@@ -22,7 +22,8 @@
   "dependencies": {
     "body-parser": "^1.17.1",
     "express.js": "^1.0.0",
-    "mongodb": "^2.2.25"
+    "mongodb": "^2.2.25",
+    "mongoose": "^4.9.5"
   },
   "devDependencies": {
     "chai": "^3.5.0",
