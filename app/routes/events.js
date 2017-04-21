@@ -2,7 +2,11 @@
 const event = require('../models/event')
 
 function getEvents(req, res) {
-  let query = event.find()
+  let searchCriteria = {}
+  if(req.query.title) {
+    searchCriteria.title = new RegExp(req.query.title, 'i')
+  }
+  let query = event.find(searchCriteria)
   query
     .then( events => {
       res.status(200).json(events)
