@@ -1,6 +1,6 @@
 'use strict'
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
 let eventSchema = new Schema({
   title: { type: String, required: true },
@@ -8,4 +8,4 @@ let eventSchema = new Schema({
   createdAt: { type: Date, required: true, default:() => new Date()},
 })
 
-module.exports = mongoose.model('event', eventSchema);
+module.exports = mongoose.model('event', eventSchema)
