@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "watch": "nodemon app.js",
+    "start": "node --harmony_array_includes app.js",
+    "watch": "nodemon --harmony_array_includes app.js",
     "test": "mocha"
   },
   "repository": {

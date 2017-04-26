@@ -77,9 +77,13 @@ function initializeRoutes() {
     .get(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.getEvent)
     .put(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.updateEvent)
     .delete(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.deleteEvent)
+
+  app.route('/api/events/:id/rsvp')
+    .put(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.updateEventRSVP)
+    .delete(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.deleteEventRSVP)
+
 }
 
 function getUserName(request, response) {
   return request.user && request.user.username || false
 }
-
