@@ -3,9 +3,15 @@ const event = require('../models/event')
 
 function getEvents(req, res) {
   let searchCriteria = {}
+  
   if(req.query.title) {
     searchCriteria.title = new RegExp(req.query.title, 'i')
   }
+
+  if(req.query.createdBy) {
+    searchCriteria.username = req.query.createdBy
+  }
+    
   let query = event.find(searchCriteria)
   query
     .then( events => {
@@ -31,6 +37,7 @@ function getEvent(req, res) {
 
 function postEvent(req, res) {
   let newEvent = new event(req.body)
+  newEvent.username = req.user.username;
   newEvent.save()
     .then( event => {
       res.status(201).json(event)
@@ -45,6 +52,11 @@ function updateEvent(req, res) {
   let query = event.findById(req.params.id)
   query
     .then( event => {
+      if (event.username !== req.user.username) {
+        res.status(403).json({message: "Cannot update event that you did not create."})
+        return;
+      }
+
        let obj = Object.assign(event,req.body)
 console.log(obj);
        return obj.save()
@@ -59,7 +71,7 @@ console.log(obj);
 }
 
 function deleteEvent(req, res) {
-  event.remove({"_id": req.params.id})
+  event.remove({"_id": req.params.id, "username": req.user.username})
     .then( result => {
       res.sendStatus(202)
     })
