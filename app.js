@@ -29,11 +29,11 @@ app.use(bodyParser.json())
 let acl
 
 // *** mongoose *** ///
-mongoose.connect(config.mongoURI[app.settings.env])
+mongoose.connect("mongodb://app:app@ds062059.mlab.com:62059/database-nodecourse")
 let db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', () => {
-  app.listen(3000, () => {
+  app.listen(process.env.PORT || 3000, () => {
     acl = new nodeAcl(new nodeAcl.mongodbBackend(db.db, "acl_"))
     initializeRoles(acl)
     initializeRoutes()
