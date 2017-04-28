@@ -29,7 +29,7 @@ app.use(bodyParser.json())
 let acl
 
 // *** mongoose *** ///
-mongoose.connect("mongodb://app:app@ds062059.mlab.com:62059/database-nodecourse")
+mongoose.connect(config.mongoURI[app.settings.env])
 let db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', () => {
