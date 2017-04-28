@@ -9,33 +9,34 @@ const
   eventsRoutes = require('./app/routes/events.js'),
   passport = require('passport'),
   basicStrategy = require('passport-http').BasicStrategy,
-  nodeAcl = require('acl');
+  nodeAcl = require('acl')
 
+
+//Before asking Passport to authenticate a request, the strategy (or strategies) used by an application must be configured. Here we are using passport-http basic srategy.
 passport.use(new basicStrategy(
   function(username, password, cb) {
     user.findOne({username: username}, function(err, user) {
       if (err) { return cb(err) }
       if (!user) { return cb(null, false) }
-      if (user.password != password) { return cb(null, false) }
+      if (user.password != password) { return cb(null, false, { message: 'Incorrect password.' }) }
       return cb(null, user)
     })
   }))
 
+ // configure app to use bodyParser(). this will let us get the data from a POST
+app.use(bodyParser.json())
+
+let acl
+
 // *** mongoose *** ///
 mongoose.connect(config.mongoURI[app.settings.env])
-
-let db = mongoose.connection;
-let acl;
-
-
-app.use(bodyParser.json()) // configure app to use bodyParser(). this will let us get the data from a POST
-
+let db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', () => {
   app.listen(3000, () => {
-    acl = new nodeAcl(new nodeAcl.mongodbBackend(db.db, "acl_"));
-    initializeRoles(acl);
-    initializeRoutes();
+    acl = new nodeAcl(new nodeAcl.mongodbBackend(db.db, "acl_"))
+    initializeRoles(acl)
+    initializeRoutes()
     console.log(`Example app listening on port 3000!', 'Connected to Mongo DB ${config.mongoURI[app.settings.env]}`)
   })
 })

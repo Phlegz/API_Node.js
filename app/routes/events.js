@@ -37,7 +37,7 @@ function getEvent(req, res) {
 
 function postEvent(req, res) {
   let newEvent = new event(req.body)
-  newEvent.username = req.user.username;
+  newEvent.username = req.user.username
   newEvent.save()
     .then( event => {
       res.status(201).json(event)
@@ -54,11 +54,10 @@ function updateEvent(req, res) {
     .then( event => {
       if (event.username !== req.user.username) {
         res.status(403).json({message: "Cannot update event that you did not create."})
-        return;
+        return
       }
 
        let obj = Object.assign(event,req.body)
-console.log(obj);
        return obj.save()
     })
     .then( event => {
