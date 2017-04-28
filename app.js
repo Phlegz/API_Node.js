@@ -44,27 +44,23 @@ db.once('open', () => {
 function initializeRoles(acl) {
   acl.allow([
       {
-          roles:['guest'],
+          roles:['attendee'],
           allows:[
-              {resources:'/api/events', permissions:'get'},
+              {resources:'/api/events', permissions:['get', 'put', 'delete']},
+              {resources:'/api/events/:id', permissions:'get'},
+              {resources:'/api/users', permissions:'get'}
           ]
       },
       {
-          roles:['user'],
-          allows:[
-              {resources:'/api/events', permissions:['get', 'post', 'put', 'delete']},
-          ]
-      },
-      {
-          roles:['admin'],
+          roles:['organizer'],
           allows:[
               {resources:'/api/events', permissions:'*'},
           ]
       }
   ])
 
-  acl.addUserRoles('test', 'admin')
-  acl.addUserRoles('admin', 'admin')
+  acl.addUserRoles('test', 'attendee')
+  acl.addUserRoles('admin', 'organizer')
 }
 
 function initializeRoutes() {
@@ -82,6 +78,9 @@ function initializeRoutes() {
   app.route('/api/events/:id/rsvp')
     .put(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.updateEventRSVP)
     .delete(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.deleteEventRSVP)
+
+  app.route('/api/users/:username/rsvp')
+    .get(passport.authenticate('basic', { session: false }), acl.middleware(2, getUserName), eventsRoutes.getUserRSVP)
 
 }
 

@@ -1,5 +1,6 @@
 'use strict'
 const event = require('../models/event')
+const user = require('../models/user')
 
 function getEvents(req, res) {
   let searchCriteria = {}
@@ -116,4 +117,16 @@ function deleteEventRSVP(req,res) {
     })
 }
 
-module.exports = {getEvents, getEvent, postEvent, updateEvent, deleteEvent, updateEventRSVP, deleteEventRSVP}
+function getUserRSVP(req,res) {
+  let query = event.find({ rsvp: [req.params.username] })
+  query
+    .then(events => {
+      res.status(200).json(events)
+    })
+    .catch( err => {
+      console.log(err)
+      res.status(500).json({message: err})
+    })
+}
+
+module.exports = {getEvents, getEvent, postEvent, updateEvent, deleteEvent, updateEventRSVP, deleteEventRSVP, getUserRSVP}
